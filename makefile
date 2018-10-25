@@ -1,5 +1,5 @@
 #makefile for cel
-OBJ= io.o eval.o list.o predicate.o repl.o cel_lib.o parse.o
+OBJ= io.o eval.o list.o repl.o cel_lib.o parse.o
 
 
 repl:$(OBJ)
@@ -7,6 +7,6 @@ repl:$(OBJ)
 
 %.o:%.c
 	gcc $^ -c -o $@
-	
+
 clean:
-	del *.o *.exe
+	rm *.o *.exe
