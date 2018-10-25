@@ -41,18 +41,11 @@ int balanceparens( const char* src )
 
 
 
-box parsestr( const char* src, int span )
-{	box A;
-	A.type  = BOX_STR;
-	A.ptr   = NULL;
-	
-	//This loops backwards
-	for( int i = span - 1; i >= 0; --i )
-	{	A.ptr = cons( ch( src[i] ), ptr( A.ptr ));	
-	}
-	
-	return A;	
+list parsestr( const char* src, unsigned int span )
+{   char* c = copystr(src, span);
+     return str(c);	
 }
+
 
 
 int delimspan( const char* src )
@@ -66,8 +59,12 @@ int delimspan( const char* src )
 	
 	while( src[ret] != '(' 
 		&& src[ret] != ')' 
-		&& src[ret] != ' ' 
-		&& src[ret] != '\0' )
+		&& src[ret] != ' '
+	        && src[ret] != '\n'
+	        && src[ret] != '\t'
+
+	       
+	        && src[ret] != '\0' )
 		{
 			ret++;
 		}
@@ -78,7 +75,7 @@ int delimspan( const char* src )
 
 int skipspaces( const char* src )
 {	int ret = 0;
-	while( src[ret] == ' ' )
+	while( src[ret] == ' ' || src[ret] == '\n' || src[ret] == '\t' )
 	{	ret++;
 	}
 	return ret;
@@ -89,83 +86,96 @@ int skipspaces( const char* src )
 list tokenize( const char* src )
 {	if( *src == '\0' ) return NULL;
 	int span = delimspan( src );
-	return cons( parsestr( src, span ), ptr( tokenize( src + span + skipspaces( src + span ) )));
+	return cons( parsestr( src, span ), tokenize( src + span + skipspaces( src + span )));
 }
 
 
 
 int tokentype( list token )
-{	if( eqstrch( token, "(" ) ){ return TOKEN_OPEN_PAREN;  }
-	if( eqstrch( token, ")" ) ){ return TOKEN_CLOSE_PAREN; }
-	return TOKEN_IDENTIFIER;
+{ if( eqatom(token, str("("))){ return TOKEN_OPEN_PAREN;  }
+  if( eqatom(token, str(")"))){ return TOKEN_CLOSE_PAREN; }
+  return TOKEN_IDENTIFIER;
 }
 
 
 
 list matchparen( list token )
-{	int balance = 0;
-	do{
-		if( token == NULL ) return NULL;
-		
-		switch( tokentype( token ))
-		{	case TOKEN_OPEN_PAREN : balance++;
-				break;
-			case TOKEN_CLOSE_PAREN: balance--;
-				if( balance == 0 ) return token;
-				break;
-			default : break;
-		}
-	token = cdr(token);
-	}while(1);
+{ int balance = 0;
+  while(token != NULL ){
+    switch( tokentype(car( token )))
+    {	case TOKEN_OPEN_PAREN : balance++;
+	  break;
+        case TOKEN_CLOSE_PAREN: balance--;
+	  if( balance == 0 ) return token;
+	default : break;
+    }
+    token = cdr(token);
+  }
+  return NULL;
 }
 
+
+
+//parses a single token into an atom
+list parseliteral(list token)
+{ //test for decimal notation
+  
+  return token;//default atom
+}
 
 
 
 //takes a token list and nests compound expressions
 list parsetokens( list token )
-{	if( token == NULL ) return NULL;
+{ list l,r;
+  if(token == NULL) return NULL;
+  switch( tokentype( car(token) ) )
+    {  case TOKEN_OPEN_PAREN :
+	r = parsetokens( cdr( matchparen(token)));
+	l = parsetokens(cdr(token));
+	return cons(l,r);
 
-	list L, R;
+       case TOKEN_CLOSE_PAREN: return NULL;
 
-	switch( tokentype( token ) )
-	{	case TOKEN_OPEN_PAREN:
-				L = parsetokens( cdr( token ));
-				R = parsetokens( cdr( matchparen( token )));
-			return cons( ptr( L ), ptr( R ));
-	
-		case TOKEN_CLOSE_PAREN:
-			return NULL;
-		
-		default			:	/*case TOKEN_IDENTIFIER	:*/
-			return cons( token->left, ptr( parsetokens( cdr ( token ))));
-			break;
-			
-		// case TOKEN_STRING		:
-			// break;
-		
-		// case TOKEN_NUMBER		:
-			// break;
-	}
-	
+    default: return cons(parseliteral(car(token)), parsetokens(cdr(token)));
+    }
 }
 
 
 
 list parse( const char* src )
-{	assert( balanceparens( src ));
-	list L = tokenize( src );
-	list R = parsetokens( L );
-	freelist( L );
-	return R;
+{   assert( balanceparens( src ));
+    list tokens = tokenize( src );
+    list exprs = parsetokens( tokens );
+    return exprs;
 }
 
 
 
 list parsefile( FILE* stream )
-{	char buf[2048];
-		fgets( buf, 2048, stream );
-	return parse(buf);
+{ char buf[2048];
+  fgets( buf, 2048, stream );
+  return parse(buf);
+}
+
+
+list parsef(const char* src, ...)
+{ va_list values;
+  va_start(values, src);
+  
+  list tokens = tokenize(src);
+
+  list cur = tokens;
+  do{
+    if(eqatom(car(cur),str("%")))
+      {*car(cur) = *va_arg(values, list);
+      }
+    cur = cdr(cur);
+  }while(cur != NULL );
+
+  list parsed = parsetokens( tokens );
+  //  freelist( tokens );
+  return parsed;
 }
 
 

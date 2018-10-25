@@ -9,100 +9,99 @@
 
 #include<stdlib.h>
 #include<stdio.h>	
+#include<stdarg.h>
 
 
 
-/*
- *	boxs are passed by value 	  
- *	lists are passed by reference 
- *	memory allocation is done only for lists
- */
+//type enumeration for atomic values
+#define STRING   0x00
+#define NUMBER   0x01
+#define PAIR     0x02
+#define OPERATOR 0x03
 
-//Flag for box type
-#define BOX_Z	0x00
-#define BOX_DEC	0x01
-#define BOX_STR	0x10//Strings are lists of chars treated as an aggregate
-#define BOX_CH	0x11
-#define BOX_PTR	0x20
+//type enumeration for expression forms
+#define NIL      0x00
+#define ATOM     0x01
+#define TUPLE    0x02
+#define LIST     0x03
+#define COMPOUND 0x04
 
+
+
+
+
+
+
+
+
+
+struct atom;
  
+struct atom{
+  union{
+    char*   string;
+    double  number;
+    struct{
+      struct atom* car;
+      struct atom* cdr;
+    } pair;
+    struct atom*(*operator)(struct atom*);
+  };
+  char type;
+};
 
-
-
-//Enum for switch on list type
-#define SXPR_ATOMIC		0x00	//Linear list element or end of list 
-#define SXPR_COMPOUND	0x01	//Compound expression
-#define SXPR_TUPLE		0x02	//Both boxes hold non-pointer values: ( val1 . val2 )
-#define SXPR_EMPTY		0x03	//Empty list | nil
-
- 
- 
-struct pair;
-
-typedef struct pair*(*prop)(struct pair*);
-
-struct box
-{	char type;
-	union{
-		int				z;
-		double			dec;
-		char 			ch;
-		struct pair* 	ptr;
-		prop			op;
-	};
-}; typedef struct box box;
-
-struct pair
-{	box left, right;
-}; typedef struct pair pair;
-
-typedef pair* list;
+typedef struct atom atom;
+typedef atom*       list;
 
 
 
 
 
+int tokentype(list);
+list matchparen(list);
+
+list str(  const char*  );
+list num(  double       );
+list op(   list(*)(list));
+
+list car(  list      );
+list cdr(  list      );
+list cons( list, list);
+
+int  atomic( list       );
+int type(   list       );
+int form(   list       );
+
+int  eqlist( list, list	);
+int  eqatom( list, list );
+
+char* copystr(const char*, unsigned int);
+void freelist( list );
 
 
 list tokenize( const char* );
-box  parsestr( const char*, int );
-list quoted( const char* );
+list parsestr( const char*, unsigned int );
+
 list parse( const char* );
+list parsef(const char*, ... );
+
 list parsefile( FILE* );
 list cel_stdlib();
-list lookup( list, list );
-
+list assoc( list, list );
 
 void printlist( list, FILE* );
-void printatom( box, FILE* );
+void printatom( list, FILE* );
 void freelist( list );
 
-list cons( box, box );
 
-list cdr( list );
-list car( list );
 
-box str(const char*	);
-box ptr(list		);
-box z(	int			);
-box ch(	char		);
-box nil();
-
-int type( list );
-
-int eqlist( list,	list	);
-int eqtype( box,	box	);
-int eqbox( 	box,	box	);
-
-int eqstring(	list,	list	);
-int eqstrch( 	list,   const char* );
 
 
 list eval(  list, list );
 list apply( list, list, list );
 
 
-
+list plus( list );
 
 
 

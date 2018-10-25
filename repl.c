@@ -3,19 +3,23 @@
 
 
 
+
 int main( int argc, char** argv )
-{   list global = cel_stdlib();
-    printlist( lookup(parse("var"), global), stdout);	
+{ list global = cel_stdlib();
+
+  //testing primitive operators
+  /* list sum = assoc(str("+"),global)->operator(cons(num(1),cons(num(2),NULL))); */
+
+  /* list sum2 = apply(assoc(str("+"),global), parse("3 1 2"), global); */
+  
+  /* printlist(sum,stdout); */
+  /* printf("\n"); */
+  /* printlist(sum2,stdout); */
+  
+  do{
+    printlist(eval(parsefile(stdin),global),stdout);
     printf("\n");
-    printlist( lookup(parse("var2"), global), stdout );
-    list result;
-	
-    do{
-        result = parsefile( stdin );
-	printlist( eval( result, global ), stdout); 
-    }while( type( result ) != SXPR_EMPTY );
-	
-    freelist(result);
-		
-    return 0;
+  }while(1 );
+
+  return 0;
 }
