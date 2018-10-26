@@ -116,13 +116,21 @@ list matchparen( list token )
 
 
 
-//parses a single token into an atom
-list parseliteral(list token)
-{ //test for decimal notation
-  
-  return token;//default atom
+list horner( list token )
+{ int sum = 0;
+  for(int i = 0; i < strlen(token->string); ++i )
+    { sum = (sum * 10) + ((token->string[i]) - '0');
+    }
+  return num(sum);
 }
 
+
+
+list parseliteral( list token )
+{  if(isdigit(token->string[0]))
+    { return horner(token);
+    } else return token;
+}
 
 
 //takes a token list and nests compound expressions
@@ -131,9 +139,9 @@ list parsetokens( list token )
   if(token == NULL) return NULL;
   switch( tokentype( car(token) ) )
     {  case TOKEN_OPEN_PAREN :
-	r = parsetokens( cdr( matchparen(token)));
+	r = parsetokens(cdr( matchparen(token)));
 	l = parsetokens(cdr(token));
-	return cons(l,r);
+	return cons(l,car(r));
 
        case TOKEN_CLOSE_PAREN: return NULL;
 
@@ -147,7 +155,7 @@ list parse( const char* src )
 {   assert( balanceparens( src ));
     list tokens = tokenize( src );
     list exprs = parsetokens( tokens );
-    return exprs;
+    return car(exprs);
 }
 
 

@@ -1,12 +1,14 @@
 /*cel_lib.c*/
 #include"cel.h"
 #include<stdarg.h>
+#include<assert.h>
 
 
 
 
 list plus( list args )
-{ return num( car(args)->number + car(cdr(args))->number );
+{ assert( args != NULL && type(car(args)) == NUMBER && type(car(cdr(args))) == NUMBER );
+  return num( car(args)->number + car(cdr(args))->number );
 }
 
 

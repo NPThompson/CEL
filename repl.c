@@ -2,24 +2,29 @@
 #include"cel.h"
 
 
+void carandcdrtest( list input )
+{   printf("\n");
+    printlist(input,stdout);
+    printf("\ncar => ");
+    printlist(car(input),stdout);
+    printf("\ncdr => ");
+    printlist(cdr(input),stdout);
+}
+
 
 
 int main( int argc, char** argv )
 { list global = cel_stdlib();
 
-  //testing primitive operators
-  /* list sum = assoc(str("+"),global)->operator(cons(num(1),cons(num(2),NULL))); */
+  list input;
 
-  /* list sum2 = apply(assoc(str("+"),global), parse("3 1 2"), global); */
-  
-  /* printlist(sum,stdout); */
-  /* printf("\n"); */
-  /* printlist(sum2,stdout); */
-  
+
   do{
-    printlist(eval(parsefile(stdin),global),stdout);
-    printf("\n");
-  }while(1 );
+    input = eval(parsefile(stdin),global);
+    printlist(input,stdout);
+  }while(1);
+ 
+  
 
   return 0;
 }
