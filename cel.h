@@ -7,6 +7,11 @@
 
 
 
+
+#include"celdebug.h"
+
+
+
 #include<stdlib.h>
 #include<stdio.h>	
 #include<stdarg.h>
@@ -33,22 +38,25 @@
 
 
 
-
-
-
 struct atom;
  
 struct atom{
   union{
     char*   string;
+
     double  number;
+
     struct{
       struct atom* car;
       struct atom* cdr;
     } pair;
-    struct atom*(*operator)(struct atom*);
+
+    struct{
+      struct atom*(*fp)(struct atom*);
+      const char*    name;
+    } operator;
   };
-  char type;
+  unsigned short type;
 };
 
 typedef struct atom atom;
@@ -57,52 +65,50 @@ typedef atom*       list;
 
 
 
+list makels();
 
-int tokentype(list);
-list matchparen(list);
-
-list str(  const char*  );
-list num(  double       );
-list op(   list(*)(list));
+list str(  const char*                );
+list num(  double                     );
+list op(   list(*)(list), const char* );
 
 list car(  list      );
 list cdr(  list      );
 list cons( list, list);
 
-int  atomic( list       );
+int atomic(   list     );
+int null(   list       );
 int type(   list       );
-int form(   list       );
 
-int  eqlist( list, list	);
-int  eqatom( list, list );
-
-char* copystr(const char*, unsigned int);
-void freelist( list );
-
+char* copystr(const char*, unsigned int );
+int  eq( list, list );
 
 list tokenize( const char* );
-list parsestr( const char*, unsigned int );
 
-list parse( const char* );
-list parsef(const char*, ... );
 
-list parsefile( FILE* );
+
+//print
+void pr( list );
+void prf(list,FILE*);
+	 
+//parse
+list ps( const char* );
+list psv(const char*, ... );//variadic parse
+list psf( FILE* );
+
 list cel_stdlib();
 list assoc( list, list );
 
-void printlist( list, FILE* );
-void printatom( list, FILE* );
-void freelist( list );
 
+list fold( list, list(*fn)( list, list));
+list map(  list, list(*fn)( list )     );
 
-
-
-
+list evlist(list, list);
 list eval(  list, list );
 list apply( list, list, list );
 
 
 list plus( list );
+
 
 
 

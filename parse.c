@@ -10,15 +10,31 @@
 
 
 
-#define TOKEN_OPEN_PAREN	0x00
-#define TOKEN_CLOSE_PAREN	0x01
-#define TOKEN_IDENTIFIER	0x02
-#define TOKEN_NUMBER		0x03
-#define TOKEN_STRING		0x04
 
 
 
+list str1( const char* src, unsigned int span )
+{   char* c = copystr(src, span);
+     return str(c);	
+}
 
+
+
+list horner( const char* src, int span )
+{ int sum = 0;
+  for(int i = 0; i < span; ++i )
+    { sum = (sum * 10) + (src[i] - '0');
+    }
+  return num( sum );
+}
+
+
+
+list atomicliteral( const char* src, int span )
+{  if(isdigit(src[0]))
+    { return horner(src,span);
+    } else return str1(src,span);
+}
 
 
 
@@ -37,13 +53,6 @@ int balanceparens( const char* src )
 		i++;
 	}while(src[i] != '\0');
 	return balance == 0;
-}
-
-
-
-list parsestr( const char* src, unsigned int span )
-{   char* c = copystr(src, span);
-     return str(c);	
 }
 
 
@@ -86,88 +95,80 @@ int skipspaces( const char* src )
 list tokenize( const char* src )
 {	if( *src == '\0' ) return NULL;
 	int span = delimspan( src );
-	return cons( parsestr( src, span ), tokenize( src + span + skipspaces( src + span )));
+	return cons( atomicliteral( src, span ), tokenize( src + span + skipspaces( src + span )));
 }
 
 
 
-int tokentype( list token )
-{ if( eqatom(token, str("("))){ return TOKEN_OPEN_PAREN;  }
-  if( eqatom(token, str(")"))){ return TOKEN_CLOSE_PAREN; }
-  return TOKEN_IDENTIFIER;
+int oparen( list token )
+{ return eq(token, str("("));
+}
+
+
+
+int cparen( list token )
+{ return eq(token, str(")"));
 }
 
 
 
 list matchparen( list token )
 { int balance = 0;
-  while(token != NULL ){
-    switch( tokentype(car( token )))
-    {	case TOKEN_OPEN_PAREN : balance++;
-	  break;
-        case TOKEN_CLOSE_PAREN: balance--;
-	  if( balance == 0 ) return token;
-	default : break;
+
+  while( !null(token) )
+    { if( oparen( car( token )))
+	balance++;
+      if( cparen( car( token )))
+	{ balance--;
+	  if( balance == 0 )
+	    return token;
+	}
+      token = cdr( token );
     }
-    token = cdr(token);
-  }
-  return NULL;
+  
+  crashif( 1, "could not match parens in token list");
 }
 
 
 
-list horner( list token )
-{ int sum = 0;
-  for(int i = 0; i < strlen(token->string); ++i )
-    { sum = (sum * 10) + ((token->string[i]) - '0');
-    }
-  return num(sum);
+list nestexprs( list ls )
+{ if(null(ls)) return NULL;
+  if( oparen( car(ls) ))
+    return cons( nestexprs( cdr(ls)),
+		 nestexprs( cdr(matchparen(ls)))
+		 );
+  if( cparen( car(ls) ))
+    return NULL;
+
+  return cons( car( ls ), nestexprs( cdr(ls) ));
 }
 
 
 
-list parseliteral( list token )
-{  if(isdigit(token->string[0]))
-    { return horner(token);
-    } else return token;
-}
-
-
-//takes a token list and nests compound expressions
-list parsetokens( list token )
-{ list l,r;
-  if(token == NULL) return NULL;
-  switch( tokentype( car(token) ) )
-    {  case TOKEN_OPEN_PAREN :
-	r = parsetokens(cdr( matchparen(token)));
-	l = parsetokens(cdr(token));
-	return cons(l,car(r));
-
-       case TOKEN_CLOSE_PAREN: return NULL;
-
-    default: return cons(parseliteral(car(token)), parsetokens(cdr(token)));
-    }
+void scan( const char* src )
+{ crashif( !balanceparens( src ), "source code must have balanced parenthesese");
 }
 
 
 
-list parse( const char* src )
-{   assert( balanceparens( src ));
-    list tokens = tokenize( src );
-    list exprs = parsetokens( tokens );
-    return car(exprs);
+list ps( const char* src )
+{ scan( src );
+  list tokens = tokenize(src);
+  if(atomic(tokens))
+    return tokens;
+  else return car(nestexprs( tokens ));//For some reason nestexprs leaves a redundant cons in front
 }
 
 
 
-list parsefile( FILE* stream )
+list psf( FILE* stream )
 { char buf[2048];
   fgets( buf, 2048, stream );
-  return parse(buf);
+  return ps(buf);
 }
 
 
-list parsef(const char* src, ...)
+list psv(const char* src, ...)
 { va_list values;
   va_start(values, src);
   
@@ -175,15 +176,13 @@ list parsef(const char* src, ...)
 
   list cur = tokens;
   do{
-    if(eqatom(car(cur),str("%")))
+    if(eq(car(cur),str("%")))
       {*car(cur) = *va_arg(values, list);
       }
     cur = cdr(cur);
   }while(cur != NULL );
 
-  list parsed = parsetokens( tokens );
-  //  freelist( tokens );
-  return parsed;
+  return car(nestexprs( tokens ));//For some reason nestexprs leaves a redundant cons in front
 }
 
 

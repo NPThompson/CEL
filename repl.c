@@ -1,30 +1,25 @@
 /*CEL REPL*/
-#include"cel.h"
+#define DEBUG
 
+#include"cel.h"
+#include<assert.h>
 
 void carandcdrtest( list input )
 {   printf("\n");
-    printlist(input,stdout);
+    pr(input);
     printf("\ncar => ");
-    printlist(car(input),stdout);
+    pr(car(input));
     printf("\ncdr => ");
-    printlist(cdr(input),stdout);
+    pr(cdr(input));
 }
 
 
 
 int main( int argc, char** argv )
-{ list global = cel_stdlib();
-
-  list input;
-
-
+{ list lib = cel_stdlib();
   do{
-    input = eval(parsefile(stdin),global);
-    printlist(input,stdout);
+    pr(eval(psf(stdin),lib));
   }while(1);
- 
   
-
   return 0;
 }

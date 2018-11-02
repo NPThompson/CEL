@@ -6,27 +6,25 @@
 
 
 list cons( list lhs, list rhs)
-{  list l = (list)malloc(sizeof(atom));
+{  list l = makels();
     l->type = PAIR;
     l->pair.car = lhs;
     l->pair.cdr = rhs;
   return l;
 }
 
-
+ 
 
 list car(list L)
-{  if(L != NULL && !atomic(L))
-     return L->pair.car;
-  else return NULL;
+{ crashif( (null(L) || atomic(L)), (null(L) ? "car( nil ) undefined" : "car( <atom> ) undefined"));
+  return L->pair.car;
 }
 
 
 
 list cdr(list L)
-{  if(L != NULL && !atomic(L))
-    return L->pair.cdr;
-  else return NULL;
+{ crashif( (null(L) || atomic(L)), (null(L) ? "cdr( nil ) undefined" : "cdr( <atom> ) undefined"));
+  return L->pair.cdr;
 }
 
 
@@ -60,10 +58,11 @@ list num(double val)
 
 
 
-list op(list(*f)(list))
+list op(list(*f)(list), const char* printname)
 {  list l = (list)malloc(sizeof(atom));
   l->type = OPERATOR;
-  l->operator = f;
+  l->operator.fp = f;
+  l->operator.name = printname;
   return l;
 }
 
@@ -93,8 +92,8 @@ int form( list l )
 
 
 
-int atomic( list L )
-{ return ( L != NULL ) && ( type(L) != PAIR );
+int atomic( list l )
+{ return ( !null(l) && type(l) != PAIR );
 }
 
 
@@ -110,7 +109,7 @@ int _eqstring( char* s1, char* s2 )
 
 
 
-int eqatom(list l1, list l2)
+int _eqatom(list l1, list l2)
 { if( type(l1) != type(l2))       return 0;
   switch(type(l1))
     {case NUMBER : return l1->number == l2->number;
@@ -122,13 +121,21 @@ int eqatom(list l1, list l2)
 
 
 
-int eqlist( list l1, list l2 )
-{  if(atomic(l1) && atomic(l2)) return eqatom(l1,l2);
-  else return eqlist(car(l1),car(l2)) && eqlist(cdr(l1), cdr(l2));
+int eq( list e0, list e1 )
+{  if(atomic(e0) && atomic(e1)) return _eqatom(e0,e1);
+  else return eq(car(e0),car(e1)) && eq(cdr(e0), cdr(e1));
 }
 
 
 
-void freelist(list l)
-{
+int null( list exp )
+{ return exp == NULL;
+}
+
+
+
+list map( list ls, list(*fn)(list) )
+{ if( null( ls ))
+    return NULL;
+  else return cons( fn(car(ls)), fn(cdr(ls)) );
 }

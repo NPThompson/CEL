@@ -13,56 +13,50 @@
 
 
 
-
-
+//Requires that stream is defined in this scope
+#define _prf( txt ) fprintf( stream, txt )
 
 
 
 
  
 
-void printatom( list datum, FILE* stream )
-{   switch( type(datum) )
-    { case STRING : fprintf(stream, "'%s'",datum->string);
+void pratom( list datum, FILE* stream )
+{ if(null(datum)) return;
+  if(!null(datum) && !atomic(datum))
+    prf(datum,stream);
+  else
+    switch( type(datum) )
+
+ {  case STRING : fprintf(stream, "'%s'",datum->string);
 	break;
+
     case NUMBER: fprintf(stream, "%.2f",datum->number);
       break;
 
-    case OPERATOR: fprintf(stream, "<op>");
+    case OPERATOR: fprintf(stream, "<op:%s>", datum->operator.name);
       break;
+
     default:
       break;
-    }
+  }
 }
 
 
 
-void printlist( list l, FILE* stream )
-{ switch(form(l))
-    { case NIL: break;
+void prf( list exp, FILE* stream )
+{ _prf("(");
+  do{
+    if(null(exp)) break;
+    pratom(car(exp),stream);
+    _prf(" ");
+    exp = cdr(exp);
+  }while(1);
+  _prf(")");
+}
 
-      case LIST:
-        printatom(car(l),stream);
-        fprintf(stream," ");
-	printlist(cdr(l), stream);
-	break;
-	
-      case COMPOUND:
-	fprintf(stream,"(");
-	  printlist(car(l),stream);
-	fprintf(stream,")");
-	
-	printlist(cdr(l),stream);
-	break;
 
-      case ATOM: printatom(l, stream);
-	break;
 
-      case TUPLE:
-	printatom(car(l),stream);
-	fprintf(stream," . ");
-	printatom(cdr(l),stream);
-	break;
-    }
-} 
-
+void pr( list exp )
+{ pratom(exp,stdout);
+}

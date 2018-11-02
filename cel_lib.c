@@ -13,9 +13,9 @@ list plus( list args )
 
 
 list cel_stdlib()
-{  return parsef(
-     "(+ %) (bar 2) (quux 3)",
-     op(plus)
+{  return psv(
+     "((+ %) (foo 4) (bar 2) (quux 3))",
+     op(plus, "+\\2")
    );
 }
 
