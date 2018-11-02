@@ -1,21 +1,30 @@
 /*cel_lib.c*/
+#include"celdebug.h"
 #include"cel.h"
 #include<stdarg.h>
 #include<assert.h>
 
 
 
+#define binop( CN, FD, OP ) CN( car(args)->FD OP car(cdr(args))->FD )
+#define binargtest( FLAG, NAME) crashif( type(car(args)) != FLAG || type(car(cdr(args))) != FLAG, "wrong argument types for " #NAME)
+#define arithfp( PRIMOP, SIG ) list SIG( list args ){ crashif( null(args), #SIG " undefined on nil"); binargtest( NUMBER, SIG ); return binop( num, number, PRIMOP ); }
 
-list plus( list args )
-{ assert( args != NULL && type(car(args)) == NUMBER && type(car(cdr(args))) == NUMBER );
-  return num( car(args)->number + car(cdr(args))->number );
-}
+
+
+arithfp( +, plus );
+arithfp( /, divide );
+arithfp( *, times);
+
+
 
 
 list cel_stdlib()
 {  return psv(
-     "((+ %) (foo 4) (bar 2) (quux 3))",
-     op(plus, "+\\2")
+     "((+ %) (* %) (/ %))",
+     op(plus,   "+\\2"),
+     op(times,  "*\\2"),
+     op(divide, "/\\2")
    );
 }
 

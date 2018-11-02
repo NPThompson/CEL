@@ -4,14 +4,6 @@
 #include"cel.h"
 #include<assert.h>
 
-void carandcdrtest( list input )
-{   printf("\n");
-    pr(input);
-    printf("\ncar => ");
-    pr(car(input));
-    printf("\ncdr => ");
-    pr(cdr(input));
-}
 
 
 

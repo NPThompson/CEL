@@ -18,20 +18,18 @@
 
 
 
-
- 
-
 void pratom( list datum, FILE* stream )
 { if(null(datum)) return;
   if(!null(datum) && !atomic(datum))
     prf(datum,stream);
   else
     switch( type(datum) )
-
- {  case STRING : fprintf(stream, "'%s'",datum->string);
+   {
+    case STRING : fprintf(stream, "'%s'",datum->string);
 	break;
 
-    case NUMBER: fprintf(stream, "%.2f",datum->number);
+    case NUMBER:
+        fprintf(stream, "%.2f",datum->number);
       break;
 
     case OPERATOR: fprintf(stream, "<op:%s>", datum->operator.name);
