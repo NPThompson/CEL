@@ -9,8 +9,13 @@
 
 int main( int argc, char** argv )
 { list lib = cel_stdlib();
+  list np;
+
   do{
-    pr(eval(psf(stdin),lib));
+    np = psf(stdin);
+    printf("=> ");
+    pr( eval(np,lib) );
+    printf("\n");
   }while(1);
   
   return 0;

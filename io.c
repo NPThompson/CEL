@@ -32,6 +32,13 @@ void pratom( list datum, FILE* stream )
         fprintf(stream, "%.2f",datum->number);
       break;
 
+   case LAMBDA:
+        fprintf(stream, "<lambda>");
+	pratom( datum->lambda.params, stream );
+	fprintf(stream, " -> ");
+	pratom( datum->lambda.body, stream );
+      break;
+      
     case OPERATOR: fprintf(stream, "<op:%s>", datum->operator.name);
       break;
 

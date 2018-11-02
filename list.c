@@ -29,6 +29,21 @@ list cdr(list L)
 
 
 
+list append( list l0, list l1 )
+{ if( null( l0 ))
+    return l1;
+  else return cons( car(l0), append( cdr(l0), l1));
+}
+
+
+
+list zip( list l0, list l1 )
+{ if( null(l0) || null(l1) )
+    return NULL;
+  else return cons( cons(car(l0), cons(car(l1), NULL)), zip( cdr(l0), cdr(l1)));
+}
+
+
 char* copystr( const char* src, unsigned int sz )
 { char*  str = (char*)malloc(sizeof(sz));
 
@@ -63,6 +78,17 @@ list op(list(*f)(list), const char* printname)
   l->type = OPERATOR;
   l->operator.fp = f;
   l->operator.name = printname;
+  return l;
+}
+
+
+
+list fn(list _params, list _body, list _env )
+{ list l = (list)malloc(sizeof(atom));
+  l->type          = LAMBDA;
+  l->lambda.body   = _body;
+  l->lambda.params = _params;
+  l->lambda.env    = _env;
   return l;
 }
 

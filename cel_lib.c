@@ -18,7 +18,6 @@ arithfp( *, times);
 
 
 
-
 list cel_stdlib()
 {  return psv(
      "((+ %) (* %) (/ %))",

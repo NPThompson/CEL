@@ -23,6 +23,7 @@
 #define NUMBER   0x01
 #define PAIR     0x02
 #define OPERATOR 0x03
+#define LAMBDA   0x04
 
 //type enumeration for expression forms
 #define NIL      0x00
@@ -55,6 +56,13 @@ struct atom{
       struct atom*(*fp)(struct atom*);
       const char*    name;
     } operator;
+
+    struct{
+      struct atom* body;
+      struct atom* params;
+      struct atom* env;
+    } lambda;
+    
   };
   unsigned short type;
 };
@@ -70,6 +78,7 @@ list makels();
 list str(  const char*                );
 list num(  double                     );
 list op(   list(*)(list), const char* );
+list fn( list, list, list );//make lambda
 
 list car(  list      );
 list cdr(  list      );
@@ -101,10 +110,15 @@ list assoc( list, list );
 
 list fold( list, list(*fn)( list, list));
 list map(  list, list(*fn)( list )     );
+list zip( list, list );
+
 
 list evlist(list, list);
 list eval(  list, list );
 list apply( list, list, list );
+list append( list, list );
+
+
 
 
 list plus( list );
