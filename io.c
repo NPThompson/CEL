@@ -25,7 +25,7 @@ void pratom( list datum, FILE* stream )
   else
     switch( type(datum) )
    {
-    case STRING : fprintf(stream, "'%s'",datum->string);
+    case STRING : fprintf(stream, "\"%s\"",datum->string);
 	break;
 
     case NUMBER:
@@ -53,9 +53,15 @@ void prf( list exp, FILE* stream )
 { _prf("(");
   do{
     if(null(exp)) break;
-    pratom(car(exp),stream);
-    _prf(" ");
-    exp = cdr(exp);
+    if(atomic(exp)/*tuple*/){
+      _prf(" . ");
+      pratom( exp, stream );
+      break;
+    } else {
+      pratom(car(exp),stream);
+      _prf(" ");
+      exp = cdr(exp);
+    }
   }while(1);
   _prf(")");
 }

@@ -60,14 +60,15 @@ int balanceparens( const char* src )
 int delimspan( const char* src )
 {	if( *src == '\0' ) 
 		return 0;
-	if( *src == '(' || *src == ')' )
+	if( *src == '(' || *src == ')' || *src == '\'' )
 	{	return 1;
 	}
 	
 	int ret = 0;
 	
 	while( src[ret] != '(' 
-		&& src[ret] != ')' 
+		&& src[ret] != ')'
+	        && src[ret] != '\''
 		&& src[ret] != ' '
 	        && src[ret] != '\n'
 	        && src[ret] != '\t'

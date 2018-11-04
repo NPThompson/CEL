@@ -84,36 +84,14 @@ list op(list(*f)(list), const char* printname)
 
 
 list fn(list _params, list _body, list _env )
-{ list l = (list)malloc(sizeof(atom));
-  l->type          = LAMBDA;
-  l->lambda.body   = _body;
-  l->lambda.params = _params;
-  l->lambda.env    = _env;
-  return l;
+{ return cons( cons( str("'"), str("fn")),
+	       cons( _params, cons( _body, cons( _env, NULL))));
 }
 
 
 
 int type( list L )
 {  return L->type;
-}
-
-
-
-int form( list l )
-{ if( l == NULL ){
-    return NIL;
-  }
-  if( atomic(l)){
-    return ATOM;
-  }
-  if( atomic(car(l)) && atomic(cdr(l)) ){
-    return TUPLE;
-  }
-  if( atomic(car(l)) ){
-    return LIST;
-  }
-  else return COMPOUND;
 }
 
 

@@ -25,16 +25,6 @@
 #define OPERATOR 0x03
 #define LAMBDA   0x04
 
-//type enumeration for expression forms
-#define NIL      0x00
-#define ATOM     0x01
-#define TUPLE    0x02
-#define LIST     0x03
-#define COMPOUND 0x04
-
-
-
-
 
 
 
