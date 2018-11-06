@@ -1,5 +1,7 @@
 #include"celdebug.h"
 
+#define MAX_DEPTH 64
+
 
 
 void _printrelevant(const char* benumbered )
@@ -19,10 +21,13 @@ void prst()
   actual_depth = backtrace( calladdrs, MAX_DEPTH );
   procnames = backtrace_symbols( calladdrs, actual_depth );
 
-  for( int i = 1; i < actual_depth; ++i )//begin from one because no one cares about the prst() procedure
+  for( int i = actual_depth - 3; i > 0; --i )//prints backwards, ignores first and last stack frames( main and prst() )
     { _printrelevant(procnames[i]);
-      fprintf(stderr, ": ");
+      if( i != 1 )
+        fprintf(stderr, " -> ");
+      else fprintf( stderr, ":");
     }
 
   free(procnames);
 }
+

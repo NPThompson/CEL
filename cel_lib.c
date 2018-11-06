@@ -19,11 +19,11 @@ arithfp( *, times);
 
 
 list cel_stdlib()
-{  return psv(
+{  list table = ht(psv(
      "((+ %) (* %) (/ %))",
      op(plus,   "+\\2"),
      op(times,  "*\\2"),
      op(divide, "/\\2")
-   );
+		       ));
 }
 

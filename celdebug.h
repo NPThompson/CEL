@@ -7,8 +7,6 @@
 #ifndef CEL_DEBUG_H
 #define CEL_DEBUG_H
 
-#define MAX_DEPTH 10
-
 //print stack trace
 void prst();
 

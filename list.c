@@ -90,6 +90,30 @@ list fn(list _params, list _body, list _env )
 
 
 
+list ar( list init )
+{ list l = (list)malloc(sizeof(atom));
+  l->type = ARRAY;
+  l->array.size = lgh(init);
+  l->array.records = (atom**)malloc(l->array.size * sizeof(atom*));
+
+  for(int i = 0; i < l->array.size; ++i )
+    { l->array.records[i] = car(init);
+      init = cdr( init );
+    }
+  return l;
+}
+
+unsigned int lgh( list l )
+{ unsigned int result = 0;
+  while( !null(l) )
+    {result += 1;
+      l = cdr(l);
+    }
+  return result;
+}
+
+
+
 int type( list L )
 {  return L->type;
 }
@@ -138,8 +162,17 @@ int null( list exp )
 
 
 
+list _arraymap( list ls, list(*fn)(list) )
+{ for( int i = 0; i < ls->array.size; ++i )
+    { ls->array.records[i] = fn( ls->array.records[i] );
+    }
+  return ls;
+}
+
 list map( list ls, list(*fn)(list) )
 { if( null( ls ))
     return NULL;
+  if( type(ls) == ARRAY )
+    return _arraymap( ls, fn );
   else return cons( fn(car(ls)), fn(cdr(ls)) );
 }

@@ -13,10 +13,6 @@
 #define CEL_NIL    0x05
 #define CEL_UNDEF  0x06
 
-//Lambda accessors
-#define FN_EXP( _op ) car(cdr(cdr( _op )))
-#define FN_PAR( _op ) car(cdr( _op ))
-#define FN_ENV( _op ) cdr(cdr(cdr( _op )))
 
 
 
@@ -43,23 +39,6 @@ int form( list expr )
 
 
 
-#define GETKEY( x ) car(car(x))
-#define GETVAL( x ) car(cdr(car(x)))
-
-
-
-
-list assoc(list key, list table)
-{ while( table != NULL )
-    { if(eq(key, GETKEY(table)))
-	return GETVAL(table);
-      else table = cdr(table);
-    }
-  return NULL;
-}
-
-
-
 list evlist( list expr, list env )
 { if( null(expr) || atomic(expr) )
     return expr;
@@ -74,17 +53,17 @@ list evlist( list expr, list env )
 list eval(  list expr, list env )
 { switch( form( expr ))
     {
-    case CEL_NIL :
-	return expr;
-    case CEL_ATOM :
-        return expr;
-    case CEL_SYMBOL :
-      return assoc( expr, env );
-    case CEL_QUOTE :
+    case CEL_NIL:
+      return expr;
+    case CEL_ATOM:
+      return expr;
+    case CEL_SYMBOL:
+      return ix( env, expr->string );
+    case CEL_QUOTE:
       return cdr( expr );
-    case CEL_LAMBDA :
-      return fn(car(cdr(expr)),car(cdr(cdr(expr))), env);
-    case CEL_APPLY :
+    case CEL_LAMBDA:
+      return fn( cadr(expr), caddr(expr), env );
+    case CEL_APPLY:
       return apply( eval(   car(expr), env),
   		    evlist( cdr(expr), env),
   		    env
@@ -100,8 +79,9 @@ list apply( list op, list args, list env)
 { if( type(op) == OPERATOR )
     return op->operator.fp( args );
 //two appends: arguments first priority, then original environment, then current environment
-  if( !atomic( op ) && !atomic( car( op )) && eq( cdr(car( op )), str( "fn")) )
-    return eval( FN_EXP( op ), append( zip( FN_PAR( op ), args), append( FN_ENV( op ), env )));
+  else return eval( caddr( op ),
+                 append( zip(    cadr( op ), args),
+			 append( cdddr( op ), env )));
   crashif(1, "operator is not a primitive or a compound operation");
 }
 
