@@ -19,8 +19,8 @@ unsigned int hashgen( const char* src )
 
 //insert
 void _ins( list table, list k, list val )
-{ crashif( type(k)     != STRING, "only strings are usable as keys in hashes");
-  crashif( type(table) != HASH,   "ins applied to non-hashtable argument");
+{ crashif( type(k)     != STRING, "%s", "only strings are usable as keys in hashes");
+  crashif( type(table) != HASH,   "%s", "ins applied to non-hashtable argument");
 
   list* hash = (table->array.records + hashgen( k->string ));
 
@@ -75,10 +75,10 @@ list _assoc( list record, const char* _key )
 
 //index
 list ix( list table, const char* key )
-{ crashif( type(table) != HASH, "ix applied to non-hashtable argument");
+{ crashif( type(table) != HASH, "%s", "ix applied to non-hashtable argument");
   list result = _assoc( table->array.records[ hashgen( key ) ], key );
 
-  crashif( null(result), "the given key has no matching value in the table");
+  crashif( null(result), "%s", "the given key has no matching value in the table");
   return result;
 }
 	 

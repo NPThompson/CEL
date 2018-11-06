@@ -20,7 +20,7 @@ int main( int argc, char** argv )
   do{
     np = psf(stdin);
     printf("=> ");
-    pr( eval(np,lib) );
+    pr( eval(np, NULL, lib) );
     printf("\n");
   }while(1);
   

@@ -24,6 +24,8 @@
 #define OPERATOR 0x04
 #define HASH     0x05//Hash table and array both use the array structure in the atom union,
 #define ARRAY    0x06//But treat it differently.
+#define LAMBDA   0x07
+
 
 #define caar(  S_EXPR ) car(car(S_EXPR))
 #define cdar(  S_EXPR ) cdr(car(S_EXPR))
@@ -59,7 +61,7 @@ struct atom{
       struct atom* params;
       struct atom* env;
     } lambda;
-
+    
     struct{
       struct atom** records;
       unsigned int size;
@@ -104,16 +106,16 @@ int null(   list       );
 int type(   list       );
 
 char* copystr(const char*, unsigned int );
-int  eq( list, list );
+int   eq( list, list );
 
-list tokenize( const char* );
+list  tokenize( const char* );
 
 
 
 //print
 void pr( list );
 void prf(list,FILE*);
-	 
+
 //parse
 list ps( const char* );
 list psv(const char*, ... );//variadic parse
@@ -133,9 +135,9 @@ list map(  list, list(*fn)( list )     );
 list zip( list, list );
 
 
-list evlist(list, list);
-list eval(  list, list );
-list apply( list, list, list );
+list evlist(list, list, list);
+list eval(  list, list, list );
+list apply( list, list, list, list );
 list append( list, list );
 
 

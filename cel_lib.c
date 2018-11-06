@@ -7,8 +7,8 @@
 
 
 #define binop( CN, FD, OP ) CN( car(args)->FD OP car(cdr(args))->FD )
-#define binargtest( FLAG, NAME) crashif( type(car(args)) != FLAG || type(car(cdr(args))) != FLAG, "wrong argument types for " #NAME)
-#define arithfp( PRIMOP, SIG ) list SIG( list args ){ crashif( null(args), #SIG " undefined on nil"); binargtest( NUMBER, SIG ); return binop( num, number, PRIMOP ); }
+#define binargtest( FLAG, NAME) crashif( type(car(args)) != FLAG || type(car(cdr(args))) != FLAG, "%s", "wrong argument types for " #NAME)
+#define arithfp( PRIMOP, SIG ) list SIG( list args ){ crashif( null(args), "%s", #SIG " undefined on nil"); binargtest( NUMBER, SIG ); return binop( num, number, PRIMOP ); }
 
 
 

@@ -3,7 +3,7 @@
 #define MAX_DEPTH 64
 
 
-
+//only prints the name of the procedure
 void _printrelevant(const char* benumbered )
 { int start = 0;
   while( benumbered[start] != '(' )
@@ -13,6 +13,7 @@ void _printrelevant(const char* benumbered )
     
 }
 
+//print stack trace
 void prst()
 { void *calladdrs[ MAX_DEPTH ];
   char **procnames;
@@ -21,11 +22,9 @@ void prst()
   actual_depth = backtrace( calladdrs, MAX_DEPTH );
   procnames = backtrace_symbols( calladdrs, actual_depth );
 
-  for( int i = actual_depth - 3; i > 0; --i )//prints backwards, ignores first and last stack frames( main and prst() )
+  for( int i = actual_depth - 3; i > 0; --i )//prints backwards, starting from main
     { _printrelevant(procnames[i]);
-      if( i != 1 )
-        fprintf(stderr, " -> ");
-      else fprintf( stderr, ":");
+      fprintf(stderr, ((i == 1) ? ": " : " -> "));
     }
 
   free(procnames);

@@ -16,14 +16,14 @@ list cons( list lhs, list rhs)
  
 
 list car(list L)
-{ crashif( (null(L) || atomic(L)), (null(L) ? "car( nil ) undefined" : "car( <atom> ) undefined"));
+{ crashif( (null(L) || atomic(L)), "%s", (null(L) ? "car( nil ) undefined" : "car( <atom> ) undefined"));
   return L->pair.car;
 }
 
 
 
 list cdr(list L)
-{ crashif( (null(L) || atomic(L)), (null(L) ? "cdr( nil ) undefined" : "cdr( <atom> ) undefined"));
+{ crashif( (null(L) || atomic(L)), "%s", (null(L) ? "cdr( nil ) undefined" : "cdr( <atom> ) undefined"));
   return L->pair.cdr;
 }
 
@@ -84,8 +84,12 @@ list op(list(*f)(list), const char* printname)
 
 
 list fn(list _params, list _body, list _env )
-{ return cons( cons( str("'"), str("fn")),
-	       cons( _params, cons( _body, cons( _env, NULL))));
+{ list l = (list)malloc(sizeof(atom));
+  l->type = LAMBDA;
+  l->lambda.body = _body;
+  l->lambda.params = _params;
+  l->lambda.env = _env;
+  return l;
 }
 
 

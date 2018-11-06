@@ -10,6 +10,12 @@
 //print stack trace
 void prst();
 
-#define crashif( prop, msg ) if( prop ){ fprintf(stderr, "Error in: "); prst(); fprintf(stderr, "\n%s\n", msg ); exit( 0 ); }
+#define crashif( _PROP_, _MSG_, ... )do{ \
+if( _PROP_ )                                  \
+{ fprintf(stderr, "The Error:\n\t" #_PROP_ "\nOccurred in: " );  \
+  prst();                                     \
+  fprintf(stderr, _MSG_, __VA_ARGS__ );       \
+  exit( 0 ); }                                \
+}while(0)
 
 #endif

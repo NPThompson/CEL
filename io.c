@@ -18,27 +18,6 @@
 
 
 
-/* void printbucket( ht_record r ) */
-/* { printf(" %s = %d", r.key, r.data ); */
-/*   if( r.next != NULL ) */
-/*     {  */
-/*       printbucket(*(r.next)); */
-/*     } */
-/* } */
-
-
-/* void printtable( ht t ) */
-/* { for( int i = 0; i < HT_SIZE; ++i ) */
-/*     { if( !_empty( t + i )) */
-/* 	{ printf("%d#", ht_hh(t[i].key)); */
-/* 	  printbucket( t[i] ); */
-/* 	  printf("\n"); */
-/* 	} */
-/*     } */
-/* } */
-
-
-
 
 void pratom( list datum, FILE* stream )
 { if(null(datum)) return;
@@ -54,15 +33,17 @@ void pratom( list datum, FILE* stream )
         fprintf(stream, "%.2f",datum->number);
       break;
 
-   /* case LAMBDA: */
-   /*      fprintf(stream, "<lambda>"); */
-   /* 	pratom( datum->lambda.params, stream ); */
-   /* 	fprintf(stream, " -> "); */
-   /* 	pratom( datum->lambda.body, stream ); */
-   /*    break; */
-      
     case OPERATOR: fprintf(stream, "<op:%s>", datum->operator.name);
       break;
+
+   case LAMBDA:
+     _prf("(fn ");
+     pratom( datum->lambda.params, stream );
+     _prf(" -> ");
+     pratom( datum->lambda.body, stream );
+     _prf(")");
+     break;
+      
 
    case HASH:
      _prf("[");
@@ -96,13 +77,14 @@ void prf( list exp, FILE* stream )
   do{
     if(null(exp)) break;
     if(atomic(exp)/*tuple*/){
-      _prf(" . ");
+      _prf(". ");
       pratom( exp, stream );
       break;
     } else {
       pratom(car(exp),stream);
-      _prf(" ");
       exp = cdr(exp);
+      if( !null(exp))
+	_prf(" ");
     }
   }while(1);
   _prf(")");

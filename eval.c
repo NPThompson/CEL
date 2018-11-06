@@ -12,6 +12,7 @@
 #define CEL_LAMBDA 0x07
 #define CEL_NIL    0x05
 #define CEL_UNDEF  0x06
+#define CEL_DEFINE 0x08
 
 
 
@@ -30,6 +31,8 @@ int form( list expr )
 	   return CEL_QUOTE;
 	  if( eq( car(expr), str( "fn")))
 	    return CEL_LAMBDA;
+	  if( eq( car(expr), str("def")))
+	    return CEL_DEFINE;
 	}
       return CEL_APPLY;
     }
@@ -39,18 +42,28 @@ int form( list expr )
 
 
 
-list evlist( list expr, list env )
+list evlist( list expr, list local, list global )
 { if( null(expr) || atomic(expr) )
     return expr;
   else return
-	 cons( eval(   car( expr ), env),
-	       evlist( cdr( expr ), env)
+	 cons( eval(   car( expr ), local, global),
+	       evlist( cdr( expr ), local, global)
 	       );
 }
- 
+
+
+
+list assoc( list key, list table )
+{ if( null( table ))
+    return NULL;
+  if( eq(key, caar(table)))
+    return cadar(table);
+  else return assoc(key,cdr(table));
+}
+
 
 //env is a pointer to a pointer to an atom, so that def can extend it
-list eval(  list expr, list env )
+list eval(  list expr, list local, list global )
 { switch( form( expr ))
     {
     case CEL_NIL:
@@ -58,31 +71,40 @@ list eval(  list expr, list env )
     case CEL_ATOM:
       return expr;
     case CEL_SYMBOL:
-      return ix( env, expr->string );
+      if( null(assoc(expr,local)))
+	return ix( global, expr->string );
+      else return assoc(expr,local);
     case CEL_QUOTE:
       return cdr( expr );
     case CEL_LAMBDA:
-      return fn( cadr(expr), caddr(expr), env );
+      return fn( cadr(expr), caddr(expr), global );
     case CEL_APPLY:
-      return apply( eval(   car(expr), env),
-  		    evlist( cdr(expr), env),
-  		    env
+      return apply( eval(   car(expr), local, global),
+  		    evlist( cdr(expr), local, global),
+                    local,
+		    global
   		  );
+    case CEL_DEFINE:
+      ins( global, cadr(expr)->string, eval( caddr(expr), local, global ));
+      return cadr(expr);
+      
     default:
-      crashif(1,"could not evaluate the expression");
+      crashif(1,"%s", "could not evaluate the expression");
     }
 }
 
 
 
-list apply( list op, list args, list env)
+list apply( list op, list args, list local, list global)
 { if( type(op) == OPERATOR )
     return op->operator.fp( args );
 //two appends: arguments first priority, then original environment, then current environment
-  else return eval( caddr( op ),
-                 append( zip(    cadr( op ), args),
-			 append( cdddr( op ), env )));
-  crashif(1, "operator is not a primitive or a compound operation");
+  if( type(op) == LAMBDA )
+    return eval( op->lambda.body,
+                 append( zip( op->lambda.params, args ), local ),//append newly substituted arguments to local arguments
+                 global );
+		
+  crashif( 1, "%s", "unknown operator type");
 }
 
 #undef FN_EXP
