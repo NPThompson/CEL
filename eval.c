@@ -70,7 +70,7 @@ list evcond(list expr, list local, list global )
 { do{
     expr = cdr(expr);
     if( !null(eval( caar(expr), local, global)))
-      return cdar(expr);
+      return cadar(expr);
   }while(!null(expr));
 }
 //env is a pointer to a pointer to an atom, so that def can extend it

@@ -32,19 +32,20 @@ list ls( list args ){ return args; }
 //car not behaving as it should
 list fixcar( list args ){ return caar( args ); }
 list fixcdr( list args ){ return cdar( args ); }
-
+list fixcons(list args) { return cons(car(args),cadr(args)); }
 
 
 list cel_corelib()
 {  list table = ht(psv(
-     "((+ %) (* %) (/ %) (- %) (car %) (cdr %) (ls %))",
+     "((+ %) (* %) (/ %) (- %) (car %) (cdr %) (ls %) (cons %))",
      op(plus,   "+\\2"),
      op(times,  "*\\2"),
      op(divide, "/\\2"),
      op(minus,  "-\\2"),
      op(fixcar,    "car\\1"),
      op(fixcdr,    "cdr\\1"),
-     op(ls,     "ls\\n")
+     op(ls,     "ls\\n"),
+     op(fixcons, "cons\\2")
      
      
    ));
