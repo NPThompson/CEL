@@ -33,6 +33,8 @@ list ls( list args ){ return args; }
 list fixcar( list args ){ return caar( args ); }
 list fixcdr( list args ){ return cdar( args ); }
 
+
+
 list cel_corelib()
 {  list table = ht(psv(
      "((+ %) (* %) (/ %) (- %) (car %) (cdr %) (ls %))",
@@ -43,6 +45,7 @@ list cel_corelib()
      op(fixcar,    "car\\1"),
      op(fixcdr,    "cdr\\1"),
      op(ls,     "ls\\n")
+     
      
    ));
 }

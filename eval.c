@@ -36,6 +36,8 @@ int form( list expr )
 	    return CEL_LAMBDA;
 	  if( eq( car(expr), str("def")))
 	    return CEL_DEFINE;
+	  if( eq( car(expr), str("cond")))
+	    return CEL_COND;
 	}
       return CEL_APPLY;
     }
@@ -64,7 +66,13 @@ list assoc( list key, list table )
   else return assoc(key,cdr(table));
 }
 
-
+list evcond(list expr, list local, list global )
+{ do{
+    expr = cdr(expr);
+    if( !null(eval( caar(expr), local, global)))
+      return cdar(expr);
+  }while(!null(expr));
+}
 //env is a pointer to a pointer to an atom, so that def can extend it
 list eval(  list expr, list local, list global )
 { switch( form( expr ))
@@ -87,6 +95,8 @@ list eval(  list expr, list local, list global )
                     local,
 		    global
   		  );
+    case CEL_COND:
+      return eval( evcond( expr, local, global ), local, global);
     case CEL_DEFINE:
       ins( global, cadr(expr)->string, eval( caddr(expr), local, global ));
       return cadr(expr);

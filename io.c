@@ -82,7 +82,7 @@ void prt( int type, FILE* stream )
       TCASE( HASH   );
       TCASE( LAMBDA );
       TCASE( ARRAY  );
-    default: fprintf(stream,"<unknown type"); break;
+    default: fprintf(stream,"<unknown type>"); break;
     }
 }
 #undef TCASE
