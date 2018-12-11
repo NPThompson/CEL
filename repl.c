@@ -6,22 +6,16 @@
 
 
 
-list plus2( list arg )
-{ arg->number += 2;
-  return arg;
-}
-
-
 
 int main( int argc, char** argv )
-{ list lib = cel_stdlib();
+{ list lib = cel_corelib();
   list np;
     
   do{
+    printf("\n  ");
     np = psf(stdin);
     printf("=> ");
     pr( eval(np, NULL, lib) );
-    printf("\n");
   }while(1);
   
   return 0;

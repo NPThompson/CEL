@@ -127,7 +127,7 @@ list matchparen( list token )
       token = cdr( token );
     }
   
-  crashif( 1, "%s", "could not match parens in token list");
+  errv("could not match parens in token list");
 }
 
 
@@ -147,7 +147,8 @@ list nestexprs( list ls )
 
 
 void scan( const char* src )
-{ crashif( !balanceparens( src ), "%s", "source code must have balanced parenthesese");
+{ if(!balanceparens(src))
+    errv("Source code has unbalanced parenthesese");
 }
 
 

@@ -27,6 +27,7 @@
 #define LAMBDA   0x07
 
 
+
 #define caar(  S_EXPR ) car(car(S_EXPR))
 #define cdar(  S_EXPR ) cdr(car(S_EXPR))
 #define cadr(  S_EXPR ) car(cdr(S_EXPR))
@@ -87,9 +88,10 @@ typedef atom*       list;
 
 
 
-
+//As opposed to malloc: makels tracks the new list for eventual garbage collection
 list makels();
 
+//Atomic initializers : list wraps primitive value
 list str(  const char*                );
 list num(  double                     );
 list op(   list(*)(list), const char* );
@@ -97,53 +99,60 @@ list fn( list, list, list );//make lambda
 list ar( list );
 list ht( list );//from list of pairs
 
+//Pair Selection and Construction
 list car(  list      );
 list cdr(  list      );
 list cons( list, list);
 
-int atomic(   list     );
-int null(   list       );
-int type(   list       );
-
-char* copystr(const char*, unsigned int );
+//Predicates
+int atomic( list );
+int null(   list );
 int   eq( list, list );
 
-list  tokenize( const char* );
+int type(   list );
+char* copystr(const char*, unsigned int );
 
 
 
-//print
+
+
+
+//print 
 void pr( list );
 void prf(list,FILE*);
+void prt(int, FILE*);
+
 
 //parse
-list ps( const char* );
-list psv(const char*, ... );//variadic parse
-list psf( FILE* );
+list tokenize( const char* );       //transforms buffer into list of tokens
+list ps( const char* );             //parse buffer
+list psv(const char*, ... );        //variadic parse
+list psf( FILE* );                  //parse file
 
-list cel_stdlib();
-list assoc( list, list );
+//library functions
+list cel_corelib();                 //core functions: arithmetic, car, cdr, etc.
+list assoc( list, list );           //returns the value associated with the symbol in a table
+list append( list, list);           //append the second list to the first
 
-unsigned int lgh(list);//length of a list
 
 
-void ins( list, const char*, list );//insert entry into hash table
-list ix(  list, const char*);//index hash table
+void ins( list, const char*, list );       //insert entry into hash table
+list ix(  list, const char*);              //index hash table
 
 list fold( list, list(*fn)( list, list));
 list map(  list, list(*fn)( list )     );
 list zip( list, list );
+unsigned int lgh(list);                    //length of a list
 
-
-list evlist(list, list, list);
-list eval(  list, list, list );
-list apply( list, list, list, list );
-list append( list, list );
-
+//EVAL/APPLY
+list eval( list, list, list );
 
 
 
-list plus( list );
+
+
+
+
 
 
 

@@ -70,7 +70,22 @@ void pratom( list datum, FILE* stream )
   }
 }
 
-
+#define TCASE( _X_ ) case _X_ : fprintf( stream, "<" #_X_ ">" ); break;
+void prt( int type, FILE* stream )
+{ 
+  switch(type)
+    { TCASE( STRING );
+      TCASE( SYMBOL );
+      TCASE( NUMBER );
+      TCASE( PAIR   );
+      TCASE( OPERATOR);
+      TCASE( HASH   );
+      TCASE( LAMBDA );
+      TCASE( ARRAY  );
+    default: fprintf(stream,"<unknown type"); break;
+    }
+}
+#undef TCASE
 
 void prf( list exp, FILE* stream )
 { _prf("(");

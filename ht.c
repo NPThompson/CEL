@@ -19,8 +19,16 @@ unsigned int hashgen( const char* src )
 
 //insert
 void _ins( list table, list k, list val )
-{ crashif( type(k)     != STRING, "%s", "only strings are usable as keys in hashes");
-  crashif( type(table) != HASH,   "%s", "ins applied to non-hashtable argument");
+{ if(type(k) != STRING)
+    errv("Cannot compute (ins %l %l %l), key has wrong type %t",
+         table,
+	 k,
+	 val,
+	 type(k));
+  if(type(table) != HASH)
+    errv("Attempt to insert values into %l, which is a %t, not a hash table.",
+	 table,
+	 type(table));
 
   list* hash = (table->array.records + hashgen( k->string ));
 
@@ -75,10 +83,17 @@ list _assoc( list record, const char* _key )
 
 //index
 list ix( list table, const char* key )
-{ crashif( type(table) != HASH, "%s", "ix applied to non-hashtable argument");
+{ if(type(table) != HASH)
+    errv("Attempt to index %l, which is a %t, not a hash-table",
+	 table,
+	 type(table));
   list result = _assoc( table->array.records[ hashgen( key ) ], key );
 
-  crashif( null(result), "%s", "the given key has no matching value in the table");
+  if(null(result)){
+    fprintf(stderr, "%s", key);
+    errv(" has no matching value in %l",
+       table);
+  }
   return result;
 }
 	 

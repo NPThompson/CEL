@@ -1,5 +1,5 @@
 #makefile for cel
-OBJ= io.o eval.o list.o cel_lib.o parse.o gc.o celdebug.o
+OBJ= io.o eval.o list.o cel_lib.o parse.o gc.o celdebug.o ht.o
 
 
 repl:$(OBJ) repl.o 
@@ -15,4 +15,4 @@ test:$(OBJ) iotest.o
 	gcc $^ -c -o $@
 
 clean:
-	rm *.o *.exe
+	rm *.o

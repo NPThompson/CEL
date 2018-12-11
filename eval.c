@@ -17,6 +17,9 @@
 
 
 
+list apply(list,list,list,list);
+list evlist(list,list,list);
+
 
 int form( list expr )
 { if( null( expr ))
@@ -89,7 +92,8 @@ list eval(  list expr, list local, list global )
       return cadr(expr);
       
     default:
-      crashif(1,"%s", "could not evaluate the expression");
+      errv("cannot evaluate %l",
+	   expr);
     }
 }
 
@@ -104,8 +108,11 @@ list apply( list op, list args, list local, list global)
                  append( zip( op->lambda.params, args ), local ),//append newly substituted arguments to local arguments
                  global );
 		
-  crashif( 1, "%s", "unknown operator type");
+  errv("cannot apply %l: Expected an OPERATOR or LAMBDA, got %t",
+       op,
+       type(op));
 }
+
 
 #undef FN_EXP
 #undef FN_ENV

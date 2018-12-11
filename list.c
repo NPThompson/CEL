@@ -16,14 +16,20 @@ list cons( list lhs, list rhs)
  
 
 list car(list L)
-{ crashif( (null(L) || atomic(L)), "%s", (null(L) ? "car( nil ) undefined" : "car( <atom> ) undefined"));
+{ if( null(L) || atomic(L) )
+    errv( "cannot compute (car %l), argument has incorrect type %t",
+	  L,
+	  type(L));
   return L->pair.car;
 }
 
 
 
 list cdr(list L)
-{ crashif( (null(L) || atomic(L)), "%s", (null(L) ? "cdr( nil ) undefined" : "cdr( <atom> ) undefined"));
+{ if( null(L) || atomic(L) )
+    errv("cannot compute (cdr %l), argument has incorrect type %t",
+	 L,
+	 type(L));
   return L->pair.cdr;
 }
 
