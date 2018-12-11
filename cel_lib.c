@@ -31,7 +31,7 @@ list ls( list args ){ return args; }
 
 //car not behaving as it should
 list fixcar( list args ){ return caar( args ); }
-list fixcdr( list args ){ return cdr( args ); }
+list fixcdr( list args ){ return cdar( args ); }
 
 list cel_corelib()
 {  list table = ht(psv(
