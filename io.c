@@ -20,7 +20,8 @@
 
 
 void pratom( list datum, FILE* stream )
-{ if(null(datum)) return;
+{ if(null(datum))
+    {fprintf(stream, "()"); return;}
   if(!null(datum) && !atomic(datum))
     prf(datum,stream);
   else

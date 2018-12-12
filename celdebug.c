@@ -44,6 +44,7 @@ void errv(const char* msg, ... )
 	{ switch( msg[i + 1] )
 	    { case 'l' :
 		prf( va_arg( values, list ), stderr );
+		break;
               case 't' :
 		prt(va_arg( values, int ), stderr );
 	      default: break;

@@ -20,14 +20,13 @@ unsigned int hashgen( const char* src )
 //insert
 void _ins( list table, list k, list val )
 { if(type(k) != STRING)
-    errv("Cannot compute (ins %l %l %l), key has wrong type %t",
-         table,
+    errv("Cannot insert %l, key %l has wrong type %t",
+         val,
 	 k,
-	 val,
 	 type(k));
   if(type(table) != HASH)
-    errv("Attempt to insert values into %l, which is a %t, not a hash table.",
-	 table,
+    errv("Cannot insert %l into a non-hashtable (type %t)",
+	 val,
 	 type(table));
 
   list* hash = (table->array.records + hashgen( k->string ));
@@ -91,8 +90,7 @@ list ix( list table, const char* key )
 
   if(null(result)){
     fprintf(stderr, "%s", key);
-    errv(" has no matching value in %l",
-       table);
+    errv(" has no matching value in the table");
   }
   return result;
 }

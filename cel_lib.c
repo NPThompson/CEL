@@ -37,7 +37,7 @@ list fixcons(list args) { return cons(car(args),cadr(args)); }
 
 list cel_corelib()
 {  list table = ht(psv(
-     "((+ %) (* %) (/ %) (- %) (car %) (cdr %) (ls %) (cons %))",
+     "((+ %) (* %) (/ %) (- %) (car %) (cdr %) (ls %) (cons %) (null %))",
      op(plus,   "+\\2"),
      op(times,  "*\\2"),
      op(divide, "/\\2"),
